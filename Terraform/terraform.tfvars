@@ -1,0 +1,5 @@
+env_prefix="dev"
+cird_block="10.0.0.0/16"
+public_key ="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJWeA44MRY6LASB5ujLvE/V10hywsY35v7s50iJHRVCa janitha@DESKTOP-V286SLJ"
+instance_type="t3.micro"
+available_zone="ap-south-1c"
