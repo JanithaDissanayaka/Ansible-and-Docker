@@ -1,0 +1,9 @@
+---
+- name: Install Docker
+  hosts: docker_server
+  tasks:
+    - name: install the docker version of Apache
+      yum:
+        name: docker
+        update_cache: yes
+        state: present
