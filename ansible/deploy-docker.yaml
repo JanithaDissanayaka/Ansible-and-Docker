@@ -3,13 +3,13 @@
   hosts: docker_server
   become: yes
   vars: 
-        ansible_python_interpreter: /usr/bin/python3
+    ansible_python_interpreter: /usr/bin/python3
   tasks:
-    - name: install python
+    - name: install python and docker
       yum:
         name: 
-          -python3
-          -docker
+          - python3
+          - docker
         update_cache: yes
         state: present
     
@@ -18,3 +18,13 @@
         state: started
         enabled: true
         name: docker
+
+- name: Install Docker Compose
+  hosts: docker_server
+  become: yes
+  tasks:
+    - name: Install Docker Compose
+      ansible.builtin.get_url:
+        url: https://github.com/docker/compose/releases/download/1.22.0/docker-compose-Linux-{{lookup('pipe', 'uname -m') }}
+        dest: /usr/local/bin/docker-compose
+        mode: +x
