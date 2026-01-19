@@ -1,0 +1,20 @@
+---
+- name: Install Python3 and Docker
+  hosts: docker_server
+  become: yes
+  vars: 
+        ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: install python
+      yum:
+        name: 
+          -python3
+          -docker
+        update_cache: yes
+        state: present
+    
+    - name: Make sure a service docker running
+      ansible.builtin.systemd_service:
+        state: started
+        enabled: true
+        name: docker
