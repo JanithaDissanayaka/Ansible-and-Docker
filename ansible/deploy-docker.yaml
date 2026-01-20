@@ -1,0 +1,66 @@
+---
+- name: Install Python3 ,Docker and Dcoker compose
+  hosts: docker_server
+  become: yes
+  gather_facts: false
+  vars: 
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: install python and docker
+      yum:
+        name: 
+          - python3
+          - docker
+        update_cache: yes
+        state: present
+    
+    - name: Install Docker Compose
+      ansible.builtin.get_url:
+        url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-{{lookup('pipe', 'uname -m') }}
+        dest: /usr/local/bin/docker-compose
+        mode: +x
+    
+    - name: Install Docker Compose v2 plugin manually
+      ansible.builtin.get_url:
+        url: "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-{{ lookup('pipe','uname -m') }}"
+        dest: /usr/libexec/docker/cli-plugins/docker-compose
+        mode: '0755'
+
+   
+    - name: Make sure a service docker running
+      ansible.builtin.systemd_service:
+        state: started
+        enabled: true
+        name: docker
+    
+- name: add ec2-user to docker group
+  hosts: docker_server
+  become: yes
+  tasks:
+    - name: add ec2-user to docker group
+      ansible.builtin.user:
+        name: ec2-user
+        groups: docker
+        append: yes
+    - name: Reset ssh connection to allow user changes to affect 'current login user'
+      ansible.builtin.meta: reset_connection
+
+- name: Start Docker Containers
+  hosts: docker_server 
+  vars_files:
+    - project-vars
+  tasks:
+    - name: Log into DockerHub
+      community.docker.docker_login:
+        username: janithadissanayaka
+        password: "{{docker_password}}"
+
+    - name: copy compose file
+      ansible.builtin.copy:
+        src: /mnt/c/Users/Janitha/Desktop/Projects/Ansible/Ansible-Docker-Terraform/docker-compose.yaml
+        dest: /home/ec2-user/docker-compose.yaml
+    
+    - name: Tear down existing services
+      community.docker.docker_compose_v2:
+        project_src: /home/ec2-user/
+        state: present 
