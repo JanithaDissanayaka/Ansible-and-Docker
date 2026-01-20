@@ -52,7 +52,7 @@
   tasks:
     - name: Log into DockerHub
       community.docker.docker_login:
-        username: janithadissanayaka
+        username: <<userr Name>>
         password: "{{docker_password}}"
 
     - name: copy compose file
