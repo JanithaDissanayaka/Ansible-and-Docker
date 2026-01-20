@@ -1,0 +1,28 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "StrongPass@123"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+  app:
+    image: janithadissanayaka/learn:auctionsite
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+    environment:
+      ASPNETCORE_URLS: http://+:80
+      ConnectionStrings__DefaultConnection: >
+        Server=db;
+        Database=AuctionDb;
+        User Id=sa;
+        Password=StrongPass@123;
+        TrustServerCertificate=True
+
+volumes:
+  mssql_data:
